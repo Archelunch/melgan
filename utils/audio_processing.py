@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 from scipy.signal import get_window
+import pyworld as pw
 import librosa.util as librosa_util
 
 
@@ -52,7 +53,8 @@ def window_sumsquare(window, n_frames, hop_length=200, win_length=800,
     # Fill the envelope
     for i in range(n_frames):
         sample = i * hop_length
-        x[sample:min(n, sample + n_fft)] += win_sq[:max(0, min(n_fft, n - sample))]
+        x[sample:min(n, sample + n_fft)
+          ] += win_sq[:max(0, min(n_fft, n - sample))]
     return x
 
 
@@ -91,3 +93,9 @@ def dynamic_range_decompression(x, C=1):
     C: compression factor used to compress
     """
     return torch.exp(x) / C
+
+
+def extract_f0(x, fs):
+    _f0, t = pw.dio(x, fs, frame_period=16)
+    f0 = pw.stonemask(x, _f0, t, fs)
+    return f0, (f0 < 0).astype(float)

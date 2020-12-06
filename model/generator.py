@@ -9,23 +9,24 @@ MAX_WAV_VALUE = 32768.0
 
 
 class Generator(nn.Module):
-    def __init__(self, mel_channel, n_residual_layers, ratios=[8, 5, 5], mult = 256, out_band = 1):
+    def __init__(self, mel_channel, n_residual_layers, ratios=[8, 5, 5], mult=256, out_band=1):
         super(Generator, self).__init__()
-        self.mel_channel = mel_channel
-        
+        self.mel_channel = mel_channel + 2
+
         generator = [nn.ReflectionPad1d(3),
-            nn.utils.weight_norm(nn.Conv1d(mel_channel, mult*2, kernel_size=7, stride=1)),
-            ]
+                     nn.utils.weight_norm(
+                         nn.Conv1d(mel_channel, mult*2, kernel_size=7, stride=1)),
+                     ]
 
         # Upsample to raw audio scale
         for _, r in enumerate(ratios):
             generator += [
                 nn.LeakyReLU(0.2),
-                nn.utils.weight_norm(nn.ConvTranspose1d(mult*2, mult, 
-                                    kernel_size=r*2, stride=r, 
-                                    padding=r // 2 + r % 2,
-                                    output_padding=r % 2)
-                                    ),
+                nn.utils.weight_norm(nn.ConvTranspose1d(mult*2, mult,
+                                                        kernel_size=r*2, stride=r,
+                                                        padding=r // 2 + r % 2,
+                                                        output_padding=r % 2)
+                                     ),
             ]
             for j in range(n_residual_layers):
                 generator += [ResStack(mult, dilation=3 ** j)]
@@ -35,7 +36,8 @@ class Generator(nn.Module):
         generator += [
             nn.LeakyReLU(0.2),
             nn.ReflectionPad1d(3),
-            nn.utils.weight_norm(nn.Conv1d(mult*2, out_band, kernel_size=7, stride=1)),
+            nn.utils.weight_norm(
+                nn.Conv1d(mult*2, out_band, kernel_size=7, stride=1)),
             nn.Tanh(),
         ]
 
@@ -43,7 +45,7 @@ class Generator(nn.Module):
         self.apply(weights_init)
 
     def forward(self, mel):
-        mel = (mel + 5.0) / 5.0 # roughly normalize spectrogram
+        mel = (mel + 5.0) / 5.0  # roughly normalize spectrogram
         return self.generator(mel)
 
     def eval(self, inference=False):
@@ -89,9 +91,11 @@ if __name__ == '__main__':
     x = torch.randn(3, 80, 10)  # (B, channels, T).
     print(x.shape)
 
-    y = model(x) # (B, 1, T ** prod(upsample_scales)
+    y = model(x)  # (B, 1, T ** prod(upsample_scales)
     print(y.shape)
-    assert y.shape == torch.Size([3, 1, 2560])  # For normal melgan torch.Size([3, 1, 2560])
+    # For normal melgan torch.Size([3, 1, 2560])
+    assert y.shape == torch.Size([3, 1, 2560])
 
-    pytorch_total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    pytorch_total_params = sum(p.numel()
+                               for p in model.parameters() if p.requires_grad)
     print(pytorch_total_params)
