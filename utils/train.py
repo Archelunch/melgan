@@ -22,10 +22,10 @@ def train(args, pt_dir, chkpt_path, trainloader, valloader, writer, logger, hp, 
     model_d = MultiScaleDiscriminator(hp.model.num_D, hp.model.ndf, hp.model.n_layers,
                                       hp.model.downsampling_factor, hp.model.disc_out).cuda()
     print("Discriminator : \n", model_d)
-    optim_g = optim.AdaBelief(model_g.parameters(),
-                              lr=hp.train.adam.lr, betas=(hp.train.adam.beta1, hp.train.adam.beta2), eps=1e-16, weight_decouple=True, rectify=True)
-    optim_d = optim.AdaBelief(model_d.parameters(),
-                              lr=hp.train.adam.lr, betas=(hp.train.adam.beta1, hp.train.adam.beta2), eps=1e-16, weight_decouple=True, rectify=True)
+    optim_g = optim.AdamP(model_g.parameters(),
+                              lr=hp.train.adam.lr, betas=(hp.train.adam.beta1, hp.train.adam.beta2), eps=1e-8, weight_decay=1e-2)
+    optim_d = optim.AdamP(model_d.parameters(),
+                              lr=hp.train.adam.lr, betas=(hp.train.adam.beta1, hp.train.adam.beta2), eps=1e-8, weight_decay=1e-2)
 
     init_epoch = -1
     step = 0

@@ -15,7 +15,7 @@ class Generator(nn.Module):
 
         generator = [nn.ReflectionPad1d(3),
                      nn.utils.weight_norm(
-                         nn.Conv1d(mel_channel, mult*2, kernel_size=7, stride=1)),
+                         nn.Conv1d(mel_channel+2, mult*2, kernel_size=7, stride=1)),
                      ]
 
         # Upsample to raw audio scale

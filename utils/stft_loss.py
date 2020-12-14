@@ -21,7 +21,7 @@ def stft(x, fft_size, hop_size, win_length, window):
         Tensor: Magnitude spectrogram (B, #frames, fft_size // 2 + 1).
     """
     x_stft = torch.stft(x, fft_size, hop_size, win_length, torch.hann_window(
-        window_length=win_length, device="cuda:0"))
+        window_length=win_length, device="cuda:0"), return_complex=False)
     real = x_stft[..., 0]
     imag = x_stft[..., 1]
 
