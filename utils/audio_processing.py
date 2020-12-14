@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 from scipy.signal import get_window
-import pyworld as pw
+from pysptk import sptk
 import librosa.util as librosa_util
 
 
@@ -96,6 +96,6 @@ def dynamic_range_decompression(x, C=1):
 
 
 def extract_f0(x, fs):
-    _f0, t = pw.dio(x, fs, frame_period=16)
-    f0 = pw.stonemask(x, _f0, t, fs)
-    return f0, (f0 < 0).astype(float)
+    f0 = sptk.swipe(x.astype(np.float64), fs,
+                    256, min=50, max=600, otype=2)
+    return f0.astype(np.float32), (f0 > 0).astype(np.float32)

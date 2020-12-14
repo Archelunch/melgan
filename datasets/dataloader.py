@@ -52,13 +52,14 @@ class MelFromDisk(Dataset):
 
         mel_path = "{}/{}.npy".format(self.hp.data.mel_path, id)
         sr, audio = read_wav_np(wavpath)
+        f0, v0 = extract_f0(audio, sr)
+        f0 = torch.from_numpy(f0).unsqueeze(0)
+        f0 = torch.clamp(f0, min=0)
+        v0 = torch.from_numpy(v0).unsqueeze(0)
         if len(audio) < self.hp.audio.segment_length + self.hp.audio.pad_short:
             audio = np.pad(audio, (0, self.hp.audio.segment_length + self.hp.audio.pad_short - len(audio)),
                            mode='constant', constant_values=0.0)
 
-        f0, v0 = extract_f0(audio, sr)
-        f0 = torch.from_numpy(f0).unsqueeze(0)
-        v0 = torch.from_numpy(v0).unsqueeze(0)
         audio = torch.from_numpy(audio).unsqueeze(0)
 
         mel = torch.from_numpy(np.load(mel_path))
