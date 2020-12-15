@@ -23,9 +23,9 @@ def train(args, pt_dir, chkpt_path, trainloader, valloader, writer, logger, hp, 
                                       hp.model.downsampling_factor, hp.model.disc_out).cuda()
     print("Discriminator : \n", model_d)
     optim_g = optim.AdamP(model_g.parameters(),
-                              lr=hp.train.adam.lr, betas=(hp.train.adam.beta1, hp.train.adam.beta2), eps=1e-8, weight_decay=1e-2)
+                          lr=hp.train.adam.lr, betas=(hp.train.adam.beta1, hp.train.adam.beta2), eps=1e-8, weight_decay=1e-2)
     optim_d = optim.AdamP(model_d.parameters(),
-                              lr=hp.train.adam.lr, betas=(hp.train.adam.beta1, hp.train.adam.beta2), eps=1e-8, weight_decay=1e-2)
+                          lr=hp.train.adam.lr, betas=(hp.train.adam.beta1, hp.train.adam.beta2), eps=1e-8, weight_decay=1e-2)
 
     init_epoch = -1
     step = 0
@@ -182,7 +182,7 @@ def train(args, pt_dir, chkpt_path, trainloader, valloader, writer, logger, hp, 
                                                                                             avg_adv_loss),
                                                                                         step))
             if epoch % hp.log.save_interval == 0:
-                save_path = os.path.join(pt_dir, '%s_%s_%04d.pt'
+                save_path = os.path.join(pt_dir, '%s_%s.pt'
                                          % (args.name, epoch))
                 torch.save({
                     'model_g': model_g.state_dict(),
