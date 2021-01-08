@@ -9,4 +9,5 @@ pillow
 pyyaml
 pyworld
 torch_optimizer
-horovod
+soundfile 
+pysptk
